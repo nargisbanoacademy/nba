@@ -157,8 +157,45 @@ function makeQuestions(subject,chapter){
   let opts=[correct,distractors[(i+c)%distractors.length],distractors[(i+1+c)%distractors.length],distractors[(i+2+c)%distractors.length]];
   const shift=(i*7+c)%4; opts=opts.slice(shift).concat(opts.slice(0,shift));
   const a=opts.indexOf(correct);
-  const qtext=`${variants[v]} In “${chapter}”, consider ${context}. The key focus is ${focus}.`;
-  const explain=`For ${chapter}, strong FBISE-style reasoning means applying the topic's actual rule or concept, checking evidence and conditions, and rejecting unsupported assumptions. ${correct}`;
+  let qtext, explain;
+  if(subject==="Urdu Grammar" || subject==="Islamiat"){
+   const urduPrompts=[
+    "درج ذیل صورتِ حال میں درست جواب منتخب کریں۔",
+    "باب «"+chapter+"» کے مطابق کون سا جواب سب سے زیادہ درست ہے؟",
+    "دی گئی معلومات کی روشنی میں بہترین نتیجہ کون سا ہے؟",
+    "درست اصول کا اطلاق کرتے ہوئے مناسب جواب منتخب کریں۔",
+    "کون سا انتخاب موضوع کی بنیادی بات کو درست طور پر بیان کرتا ہے؟",
+    "غور سے پڑھیں اور درست جواب منتخب کریں۔",
+    "کون سا جواب دی گئی صورتِ حال کی بہتر وضاحت کرتا ہے؟",
+    "موضوع کے اصول کو سامنے رکھتے ہوئے درست انتخاب کریں۔",
+    "کون سا بیان زیادہ درست اور قابلِ قبول ہے؟",
+    "درست فہم اور دلیل کی بنیاد پر جواب منتخب کریں۔"
+   ];
+   const urduOptions = subject==="Urdu Grammar" ? [
+    "جملے کے سیاق اور قواعد کے مطابق درست جواب منتخب کرنا۔",
+    "صرف لفظ کی ظاہری شکل دیکھ کر جواب دینا۔",
+    "سیاق کو نظر انداز کرکے ہر جگہ ایک ہی اصول لگانا۔",
+    "مطلب بدلے بغیر متعلقہ قاعدے کو درست طور پر لاگو کرنا۔"
+   ] : [
+    "متعلقہ اسلامی تعلیم اور موضوع کے مطابق جواب دینا۔",
+    "بغیر دلیل کے عمومی دعوے کو درست مان لینا۔",
+    "موضوع اور سیاق کو نظر انداز کرنا۔",
+    "مستند تعلیم اور درست فہم کی بنیاد پر نتیجہ اخذ کرنا۔"
+   ];
+   qtext=`${urduPrompts[v%urduPrompts.length]} موضوع: «${chapter}»۔`;
+   opts=[urduOptions[0],urduOptions[1],urduOptions[2],urduOptions[3]];
+   const shift=(i*7+c)%4; opts=opts.slice(shift).concat(opts.slice(0,shift));
+   // For localized items, mark the first option as the keyed response after the same deterministic shuffle.
+   const localizedCorrect=urduOptions[0];
+   const localizedOpts=[localizedCorrect,urduOptions[1],urduOptions[2],urduOptions[3]];
+   const localizedShift=(i*7+c)%4; opts=localizedOpts.slice(localizedShift).concat(localizedOpts.slice(0,localizedShift));
+   const a=opts.indexOf(localizedCorrect);
+   explain=subject==="Urdu Grammar" ? `باب «${chapter}» میں درست جواب کے لیے قواعد، جملے کے سیاق اور معنی کو سامنے رکھیں۔` : `باب «${chapter}» میں جواب منتخب کرتے وقت متعلقہ اسلامی تعلیم، درست مفہوم اور سیاق کو سامنے رکھیں۔`;
+   bank.push({q:qtext,o:opts,a,e:explain});
+   continue;
+  }
+  qtext=`${variants[v]} In “${chapter}”, consider ${context}. The key focus is ${focus}.`;
+  explain=`For ${chapter}, strong FBISE-style reasoning means applying the topic's actual rule or concept, checking evidence and conditions, and rejecting unsupported assumptions. ${correct}`;
   bank.push({q:qtext,o:opts,a,e:explain});
  }
  return bank;
